@@ -140,10 +140,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     saveWebhookBtn.addEventListener("click", async () => {
-        const newWebhookUrl = webhookInput.value.trim();
-        webhookUrl = newWebhookUrl;
-        await chrome.storage.sync.set({webhookUrl});
-        alert(translations[language].saveWebhook + "!");
+        webhookUrl = webhookInput.value.trim();
+
+        if (!webhookUrl || !/^https?:\/\//i.test(webhookUrl)) {
+            alert(translations[language].invalidWebhook || "Invalid webhook URL!");
+            return;
+        }
+
+        await chrome.storage.sync.set({ webhookUrl });
+        alert(translations[language].webhookSaved || "Webhook URL saved!");
     });
 
     async function addUrl(newUrl) {
@@ -211,10 +216,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function checkAllUrls() {
-        const {urls} = await chrome.storage.sync.get({urls: []});
+        const { urls, webhookUrl } = await chrome.storage.sync.get({ urls: [], webhookUrl: "" });
+
         urls.forEach((url) => {
-            chrome.runtime.sendMessage({action: "checkUrl", url});
+            chrome.runtime.sendMessage({ action: "checkUrl", url }, async (response) => {
+                if (response && !response.isHealthy && webhookUrl) {
+                    await notifyWebhook(webhookUrl, url, response.error);
+                }
+            });
         });
+    }
+
+    async function notifyWebhook(webhookUrl, failedUrl, errorMessage) {
+        try {
+            await fetch(webhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    text: `The URL ${failedUrl} is unreachable. Error: ${errorMessage}`,
+                }),
+            });
+        } catch (error) {
+            console.error("Failed to notify webhook:", error);
+        }
     }
 
     refreshButton.addEventListener("click", () => {

@@ -8,7 +8,9 @@
     "githubLink": "GitHub",
     "lastSuccessful": " önce başarılı",
     "neverSuccessful": "Hiç başarılı olmadı",
-    "intervalInputLabel": "Sn."
+    "intervalInputLabel": "Sn.",
+    "invalidWebhook": "Geçersiz webhook URL'si!",
+    "webhookSaved": "Webhook URL'si kaydedildi!"
   },
   "en": {
     "title": "Health Check",
@@ -19,6 +21,8 @@
     "githubLink": "GitHub",
     "lastSuccessful": " ago",
     "neverSuccessful": "Never successful",
-    "intervalInputLabel": "Sec."
+    "intervalInputLabel": "Sec.",
+    "invalidWebhook": "Invalid webhook URL!",
+    "webhookSaved": "Webhook URL saved!"
   }
 }
