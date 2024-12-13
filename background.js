@@ -2,7 +2,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "checkUrl") {
         (async () => {
             try {
-                // URL formatını kontrol et
                 let url = message.url;
                 if (!/^https?:\/\//i.test(url)) {
                     url = "https://" + url;
@@ -10,22 +9,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
                 const response = await fetch(url, { mode: "cors" });
                 if (response && response.ok) {
+                    const { lastSuccessTimes } = await chrome.storage.sync.get({ lastSuccessTimes: {} });
+                    lastSuccessTimes[message.url] = Date.now();
+                    await chrome.storage.sync.set({ lastSuccessTimes });
                     sendResponse({ isHealthy: true });
+                    chrome.runtime.sendMessage({
+                        action: "updateUrlStatus",
+                        url: message.url,
+                        isHealthy: true,
+                    });
                 } else {
                     sendResponse({
                         isHealthy: false,
                         error: response ? `HTTP Status: ${response.status}` : "CORS veya ağ hatası"
                     });
+
+                    chrome.runtime.sendMessage({
+                        action: "updateUrlStatus",
+                        url: message.url,
+                        isHealthy: false,
+                        error: `HTTP Status: ${response.status}`,
+                    });
+
                 }
             } catch (e) {
                 sendResponse({
                     isHealthy: false,
                     error: `Fetch Hatası: ${e.message || "Bilinmeyen hata"}`
                 });
+                chrome.runtime.sendMessage({
+                    action: "updateUrlStatus",
+                    url: message.url,
+                    isHealthy: false,
+                    error: `Fetch Hatası: ${e.message || "Bilinmeyen hata"}`,
+                });
             }
         })();
 
-        return true; // Asenkron işlemler için gerekli
+        return true;
     }
 
     if (message.action === "showAlert") {

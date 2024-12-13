@@ -1,3 +1,5 @@
+import {timeSince, translateUI} from "./utils.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
     const urlInput = document.getElementById("urlInput");
     const addUrlBtn = document.getElementById("addUrlBtn");
@@ -8,67 +10,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     const urlList = document.getElementById("urlList");
     const languageSelector = document.getElementById("languageSelector");
 
-    let { urls } = await chrome.storage.sync.get({ urls: [] });
-    let { statusMap } = await chrome.storage.sync.get({ statusMap: {} });
-    let { lastSuccessTimes } = await chrome.storage.sync.get({ lastSuccessTimes: {} });
-    let { webhookUrl } = await chrome.storage.sync.get({ webhookUrl: "" });
-    let { webhookEnabled } = await chrome.storage.sync.get({ webhookEnabled: false });
-    let { language } = await chrome.storage.sync.get({ language: "tr" });
+    let {urls} = await chrome.storage.sync.get({urls: []});
+    let {statusMap} = await chrome.storage.sync.get({statusMap: {}});
+    let {lastSuccessTimes} = await chrome.storage.sync.get({lastSuccessTimes: {}});
+    let {webhookUrl} = await chrome.storage.sync.get({webhookUrl: ""});
+    let {webhookEnabled} = await chrome.storage.sync.get({webhookEnabled: false});
+    let {language} = await chrome.storage.sync.get({language: "tr"});
+    let translations = {};
 
     webhookSwitch.checked = webhookEnabled;
     webhookSection.style.display = webhookEnabled ? "block" : "none";
     webhookInput.value = webhookUrl;
     languageSelector.value = language;
 
-    const translations = {
-        tr: {
-            title: "Sağlık Kontrolü",
-            addUrl: "URL giriniz",
-            webhookPlaceholder: "Webhook URL giriniz",
-            alertSwitchLabel: "Window Alert Kullan",
-            webhookSwitchLabel: "Webhook ile bildirim al",
-            githubLink: "GitHub",
-            lastSuccessful: " önce başarılı",
-            neverSuccessful: "Hiç başarılı olmadı",
-        },
-        en: {
-            title: "Health Check",
-            addUrl: "Enter URL",
-            webhookPlaceholder: "Enter Webhook URL",
-            alertSwitchLabel: "Use Window Alert",
-            webhookSwitchLabel: "Receive notification via webhook",
-            githubLink: "GitHub",
-            lastSuccessful: " ago",
-            neverSuccessful: "Never successful",
-        },
-    };
-
-    function translateUI() {
-        const t = translations[language];
-        urlInput.placeholder = t.addUrl;
-        webhookInput.placeholder = t.webhookPlaceholder;
-        // Translate elements with data-translate attribute
-        document.querySelectorAll("[data-translate]").forEach((element) => {
-            const key = element.getAttribute("data-translate");
-            if (t[key]) {
-                element.textContent = t[key];
+    async function loadTranslations() {
+        try {
+            const url = chrome.runtime.getURL('translations.json');
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        });
-
-        renderUrlList();
+            translations = await response.json();
+            translateUI(language, translations);
+        } catch (error) {
+            console.error('Error loading translations:', error);
+        }
     }
 
-    function timeSince(date) {
-        const now = Date.now();
-        const elapsedSeconds = Math.floor((now - date) / 1000);
-        if (elapsedSeconds < 60) return `${elapsedSeconds} sn${translations[language].lastSuccessful}`;
-        const elapsedMinutes = Math.floor(elapsedSeconds / 60);
-        if (elapsedMinutes < 60) return `${elapsedMinutes} dk${translations[language].lastSuccessful}`;
-        const elapsedHours = Math.floor(elapsedMinutes / 60);
-        if (elapsedHours < 24) return `${elapsedHours} saat${translations[language].lastSuccessful}`;
-        const elapsedDays = Math.floor(elapsedHours / 24);
-        return `${elapsedDays} gün${translations[language].lastSuccessful}`;
-    }
+    chrome.runtime.onMessage.addListener((message) => {
+        if (message.action === "updateUrlStatus") {
+            const {url, isHealthy} = message;
+            statusMap[url] = isHealthy;
+            if (isHealthy) {
+                lastSuccessTimes[url] = Date.now();
+            }
+            renderUrlList();
+        }
+    });
 
     function renderUrlList() {
         urlList.innerHTML = "";
@@ -100,12 +78,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             urlText.style.display = "flex";
 
             const timeText = document.createElement("div");
+
             const lastTime = lastSuccessTimes[url];
             if (lastTime) {
-                timeText.textContent = timeSince(lastTime);
+                timeText.textContent = timeSince(lastSuccessTimes[url], translations, language);
             } else {
                 timeText.textContent = t.neverSuccessful;
             }
+
             timeText.style.fontSize = "0.8em";
             timeText.style.color = "#555";
 
@@ -133,7 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 urls.splice(index, 1);
                 delete statusMap[url];
                 delete lastSuccessTimes[url];
-                await chrome.storage.sync.set({ urls, statusMap, lastSuccessTimes });
+                await chrome.storage.sync.set({urls, statusMap, lastSuccessTimes});
                 renderUrlList();
             });
             removeBtnDiv.appendChild(removeBtn);
@@ -149,19 +129,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     languageSelector.addEventListener("change", async () => {
         language = languageSelector.value;
         await chrome.storage.sync.set({ language });
-        translateUI();
+        translateUI(language, translations);
+        renderUrlList();
     });
 
     webhookSwitch.addEventListener("change", async () => {
         webhookEnabled = webhookSwitch.checked;
         webhookSection.style.display = webhookEnabled ? "block" : "none";
-        await chrome.storage.sync.set({ webhookEnabled });
+        await chrome.storage.sync.set({webhookEnabled});
     });
 
     saveWebhookBtn.addEventListener("click", async () => {
         const newWebhookUrl = webhookInput.value.trim();
         webhookUrl = newWebhookUrl;
-        await chrome.storage.sync.set({ webhookUrl });
+        await chrome.storage.sync.set({webhookUrl});
         alert(translations[language].saveWebhook + "!");
     });
 
@@ -175,15 +156,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             lastSuccessTimes[newUrl] = Date.now();
             statusMap[newUrl] = false;
 
-            await chrome.storage.sync.set({ urls, lastSuccessTimes, statusMap });
+            await chrome.storage.sync.set({urls, lastSuccessTimes, statusMap});
             renderUrlList();
 
-            chrome.runtime.sendMessage({ action: "checkUrl", url: newUrl }, (response) => {
+            chrome.runtime.sendMessage({action: "checkUrl", url: newUrl}, (response) => {
                 if (response && response.isHealthy) {
                     statusMap[newUrl] = true;
                     lastSuccessTimes[newUrl] = Date.now();
                 }
-                chrome.storage.sync.set({ statusMap, lastSuccessTimes }).then(renderUrlList);
+                chrome.storage.sync.set({statusMap, lastSuccessTimes}).then(renderUrlList);
             });
         }
     }
@@ -202,10 +183,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         urlInput.value = "";
     });
 
-    translateUI();
-});
-
-document.addEventListener("DOMContentLoaded", async () => {
+    translateUI(language, translations);
+    renderUrlList();
     const intervalInput = document.getElementById("intervalInput");
     const progressBar = document.getElementById("progressBar");
     const refreshButton = document.getElementById("refreshButton");
@@ -232,9 +211,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function checkAllUrls() {
-        const { urls } = await chrome.storage.sync.get({ urls: [] });
+        const {urls} = await chrome.storage.sync.get({urls: []});
         urls.forEach((url) => {
-            chrome.runtime.sendMessage({ action: "checkUrl", url });
+            chrome.runtime.sendMessage({action: "checkUrl", url});
         });
     }
 
@@ -251,6 +230,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         intervalInput.value = currentInterval;
         startTimer();
     });
-
+    await loadTranslations();
     startTimer();
 });

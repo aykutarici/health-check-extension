@@ -1,0 +1,24 @@
+{
+  "tr": {
+    "title": "Sağlık Kontrolü",
+    "addUrl": "URL giriniz",
+    "webhookPlaceholder": "Webhook URL giriniz",
+    "alertSwitchLabel": "Window Alert Kullan",
+    "webhookSwitchLabel": "Webhook ile bildirim al",
+    "githubLink": "GitHub",
+    "lastSuccessful": " önce başarılı",
+    "neverSuccessful": "Hiç başarılı olmadı",
+    "intervalInputLabel": "Sn."
+  },
+  "en": {
+    "title": "Health Check",
+    "addUrl": "Enter URL",
+    "webhookPlaceholder": "Enter Webhook URL",
+    "alertSwitchLabel": "Use Window Alert",
+    "webhookSwitchLabel": "Receive notification via webhook",
+    "githubLink": "GitHub",
+    "lastSuccessful": " ago",
+    "neverSuccessful": "Never successful",
+    "intervalInputLabel": "Sec."
+  }
+}
