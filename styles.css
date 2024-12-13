@@ -1,0 +1,229 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    padding: 15px;
+    background-color: #f9f9f9;
+    color: #333;
+    width: 300px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+}
+
+.logo-section img {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+}
+
+.title {
+    font-weight: 600;
+    font-size: 1.2em;
+}
+
+.language-selector {
+    font-size: 0.9em;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.input-group {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    font-size: 0.9em;
+}
+
+.input-group button {
+    padding: 4px;
+    border: none;
+    background-color: #189c5c;
+    color: white;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
+    width: 32px;
+    height: 32px;
+}
+
+.input-group button img{
+    width: 26px;
+    height: 26px;
+    background-size: contain;
+}
+#saveWebhookBtn{
+
+}
+
+.input-group button:hover {
+    background-color: #107544;
+}
+
+#urlList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: scroll;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#urlList li {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.url-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.status-dot.green {
+    background-color: green;
+}
+
+.status-dot.red {
+    background-color: red;
+}
+
+.time-info {
+    font-size: 0.8em;
+    color: #555;
+    margin-top: 3px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #555;
+}
+.btn-delete{
+    border: none;
+    background-color: #e81212;
+    color: white;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 24px;
+    height: 24px;
+}
+.btn-delete img{
+    width: 12px;
+    height: 12px;
+    background-size: contain;
+}
+.footer a {
+    color: #189c5c;
+    text-decoration: none;
+}
+
+.github-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.btn-link {
+    border: none;
+    background-color: #007bff; /* Mavi renk */
+    color: white;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+}
+
+.btn-link img {
+    width: 12px;
+    height: 12px;
+    background-size: contain;
+}
+
+.btn-link:hover {
+    background-color: #0056b3; /* Daha koyu mavi */
+}
+/* Link Butonu */
+.btn-link {
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-link img {
+    width: 12px;
+    height: 12px;
+    background-size: contain;
+}
+
+.btn-link:hover {
+    background-color: #0056b3;
+}
+
+/* Silme Butonu */
+.btn-delete {
+    border: none;
+    background-color: #e81212;
+    color: white;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-delete img {
+    width: 12px;
+    height: 12px;
+    background-size: contain;
+}
+

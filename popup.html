@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Check</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="header">
+    <div class="logo-section">
+        <img src="icon128.png" alt="Logo">
+        <span class="title">Health Check</span>
+    </div>
+    <select id="languageSelector" class="language-selector">
+        <option value="tr">Türkçe</option>
+        <option value="en">English</option>
+    </select>
+</div>
+
+<div>
+    <div class="input-group">
+        <input type="text" id="urlInput" placeholder="URL giriniz">
+        <button id="addUrlBtn">
+            <img src="add-icon.png" alt="">
+        </button>
+    </div>
+    <ul id="urlList" class="scrollable-list"></ul>
+</div>
+
+<div class="switch">
+    <input type="checkbox" id="alertSwitch">
+    <label for="alertSwitch">Window Alert Kullan</label>
+</div>
+
+<div class="switch">
+    <input type="checkbox" id="webhookSwitch">
+    <label for="webhookSwitch">Webhook ile bildirim al</label>
+</div>
+
+<div class="webhook-section" id="webhookSection">
+    <div class="input-group">
+        <input type="text" id="webhookInput" placeholder="Webhook URL giriniz">
+        <button id="saveWebhookBtn">
+            <img src="save.png" alt="">
+        </button>
+    </div>
+</div>
+
+<footer class="footer">
+    <a href="https://github.com/aykutarici/health-check-extension" target="_blank">
+        <img src="github-icon.png" alt="GitHub" class="github-icon">
+        GitHub
+    </a>
+</footer>
+
+<script src="popup.js"></script>
+</body>
+</html>
