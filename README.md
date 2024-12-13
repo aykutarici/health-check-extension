@@ -8,7 +8,9 @@ The extension is simple yet powerful, operating entirely within the Chrome brows
 
 ## 🎯 Features
 
-- 🔄 **Real-time Monitoring:** Automatically checks the status of your URLs every minute.
+- 🔄 **Real-time Monitoring:** Automatically checks the status of your URLs at a user-defined interval.
+- 📊 **Progress Bar Visualization:** Displays the time remaining for the next health check cycle.
+- 🔄 **Manual Refresh:** Instantly checks all URLs with the click of a button.
 - ✅ **Status Indicators:** Displays green or red dots to indicate the health of each URL.
 - 🔔 **Alerts:** Provides visual and optional window alerts when a URL is down.
 - 🔗 **Quick Access:** Visit the monitored URL directly using the "Link" button.
@@ -39,13 +41,16 @@ The extension is simple yet powerful, operating entirely within the Chrome brows
 1. Open the extension by clicking on its icon in the Chrome toolbar.
 2. Enter the URLs you want to monitor in the input field and click **Add** (or press Enter).
 3. Optional: Enable **Webhook notifications** and provide a webhook URL for external alerts.
-4. Monitor the status of each URL:
-    - 🟢 Green dot: The URL is healthy (HTTP 200 response).
-    - 🔴 Red dot: The URL is unreachable or returned an error.
-5. Use the "Link" button to open the URL in a new tab.
-6. If a URL becomes unreachable:
-    - A **popup alert** (optional) will appear.
-    - The status will update in real-time.
+4. Set the **monitoring interval** using the input field (default is 60 seconds). Adjust the value to suit your needs (minimum: 10 seconds, maximum: 300 seconds).
+5. Use the **progress bar** to visualize the countdown for the next health check cycle.
+6. Use the **refresh button** (green icon) to trigger an immediate health check for all URLs, resetting the progress bar.
+7. Monitor the status of each URL:
+   - 🟢 Green dot: The URL is healthy (HTTP 200 response).
+   - 🔴 Red dot: The URL is unreachable or returned an error.
+8. If a URL becomes unreachable:
+   - A **popup alert** (optional) will appear.
+   - A **webhook notification** (if configured) will be sent with the failed URL and error details.
+   - The status will update in real-time.
 
 ---
 
