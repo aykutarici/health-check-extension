@@ -86,9 +86,11 @@ This project thrives on community contributions! Here’s how you can help:
 ## 🖼️ Screenshots
 
 **Main Interface:**
+
 ![Main Interface](./screenshots/main_interface.png)
 
 **Webhook Configuration:**
+
 ![Webhook Settings](./screenshots/webhook_settings.png)
 
 ---

@@ -1,42 +1,26 @@
-chrome.runtime.onInstalled.addListener(() => {
-    // Dakikada bir alarm kur
-    chrome.alarms.create("healthCheckAlarm", { periodInMinutes: 1 });
-});
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-    if (alarm.name === "healthCheckAlarm") {
-        const { urls } = await chrome.storage.sync.get({ urls: [] });
-        if (!urls || urls.length === 0) return;
-
-        urls.forEach((url) => {
-            chrome.runtime.sendMessage({ action: "checkUrl", url });
-        });
-    }
-});
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "checkUrl") {
-        console.log("Kontrol edilen URL:", message.url);
-
-        // Fetch işlemini bir Promise içinde ele alıyoruz
         (async () => {
             try {
-                const response = await fetch(message.url, { mode: "cors" });
-                console.log("HTTP Durumu:", response.status);
+                // URL formatını kontrol et
+                let url = message.url;
+                if (!/^https?:\/\//i.test(url)) {
+                    url = "https://" + url;
+                }
 
-                // Yanıt durumu kodunu kontrol et
-                if (response.status === 200) {
+                const response = await fetch(url, { mode: "cors" });
+                if (response && response.ok) {
                     sendResponse({ isHealthy: true });
                 } else {
                     sendResponse({
                         isHealthy: false,
-                        error: `HTTP Status: ${response.status} ${response.statusText}`
+                        error: response ? `HTTP Status: ${response.status}` : "CORS veya ağ hatası"
                     });
                 }
             } catch (e) {
                 sendResponse({
                     isHealthy: false,
-                    error: `Fetch Hatası: ${e.message}`
+                    error: `Fetch Hatası: ${e.message || "Bilinmeyen hata"}`
                 });
             }
         })();

@@ -11,7 +11,7 @@
 <div class="header">
     <div class="logo-section">
         <img src="assets/images/icon128.png" alt="Logo">
-        <span class="title">Health Check</span>
+        <span class="title" data-translate="title">Sağlık Kontrolü</span>
     </div>
     <select id="languageSelector" class="language-selector">
         <option value="tr">Türkçe</option>
@@ -31,27 +31,38 @@
 
 <div class="switch">
     <input type="checkbox" id="alertSwitch">
-    <label for="alertSwitch">Window Alert Kullan</label>
+    <label for="alertSwitch" data-translate="alertSwitchLabel">Window Alert Kullan</label>
 </div>
 
 <div class="switch">
     <input type="checkbox" id="webhookSwitch">
-    <label for="webhookSwitch">Webhook ile bildirim al</label>
+    <label for="webhookSwitch" data-translate="webhookSwitchLabel">Webhook ile bildirim al</label>
 </div>
 
 <div class="webhook-section" id="webhookSection">
     <div class="input-group">
         <input type="text" id="webhookInput" placeholder="Webhook URL giriniz">
         <button id="saveWebhookBtn">
-            <img src="save.png" alt="">
+            <img src="assets/images/save.png" alt="">
         </button>
     </div>
+</div>
+
+<div class="timer-container">
+    <input type="number" id="intervalInput" min="10" max="300" value="60">
+    <label for="intervalInput">Saniye</label>
+    <div class="progress">
+        <div id="progressBar"></div>
+    </div>
+    <button id="refreshButton">
+        <img src="assets/images/refresh.png" alt="Refresh">
+    </button>
 </div>
 
 <footer class="footer">
     <a href="https://github.com/aykutarici/health-check-extension" target="_blank">
         <img src="assets/images/github-icon.png" alt="GitHub" class="github-icon">
-        GitHub
+        <span data-translate="githubLink">GitHub</span>
     </a>
 </footer>
 

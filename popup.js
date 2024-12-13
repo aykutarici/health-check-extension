@@ -22,23 +22,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const translations = {
         tr: {
+            title: "Sağlık Kontrolü",
             addUrl: "URL giriniz",
             webhookPlaceholder: "Webhook URL giriniz",
+            alertSwitchLabel: "Window Alert Kullan",
+            webhookSwitchLabel: "Webhook ile bildirim al",
+            githubLink: "GitHub",
             lastSuccessful: " önce başarılı",
             neverSuccessful: "Hiç başarılı olmadı",
         },
         en: {
+            title: "Health Check",
             addUrl: "Enter URL",
             webhookPlaceholder: "Enter Webhook URL",
+            alertSwitchLabel: "Use Window Alert",
+            webhookSwitchLabel: "Receive notification via webhook",
+            githubLink: "GitHub",
             lastSuccessful: " ago",
             neverSuccessful: "Never successful",
-        }
+        },
     };
 
     function translateUI() {
         const t = translations[language];
         urlInput.placeholder = t.addUrl;
         webhookInput.placeholder = t.webhookPlaceholder;
+        // Translate elements with data-translate attribute
+        document.querySelectorAll("[data-translate]").forEach((element) => {
+            const key = element.getAttribute("data-translate");
+            if (t[key]) {
+                element.textContent = t[key];
+            }
+        });
+
         renderUrlList();
     }
 
@@ -96,11 +112,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             urlTextDivInside.appendChild(urlText);
             urlTextDivInside.appendChild(timeText);
 
-            // Link Butonu
             const linkBtnDiv = document.createElement("div");
             const linkBtn = document.createElement("button");
             const linkBtnImg = document.createElement("img");
-            linkBtnImg.src = "link.png";
+            linkBtnImg.src = "./assets/images/link.png";
             linkBtn.appendChild(linkBtnImg);
             linkBtn.className = "btn-link";
             linkBtn.addEventListener("click", () => {
@@ -108,11 +123,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             linkBtnDiv.appendChild(linkBtn);
 
-            // Silme Butonu
             const removeBtnDiv = document.createElement("div");
             const removeBtn = document.createElement("button");
             const removeBtnImg = document.createElement("img");
-            removeBtnImg.src = "delete.png";
+            removeBtnImg.src = "./assets/images/delete.png";
             removeBtn.appendChild(removeBtnImg);
             removeBtn.className = "btn-delete";
             removeBtn.addEventListener("click", async () => {
@@ -126,11 +140,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             li.appendChild(statusDotDiv);
             li.appendChild(urlTextDiv);
-            li.appendChild(linkBtnDiv); // Link butonu eklendi
-            li.appendChild(removeBtnDiv); // Silme butonu eklendi
+            li.appendChild(linkBtnDiv);
+            li.appendChild(removeBtnDiv);
             urlList.appendChild(li);
         });
     }
+
+    languageSelector.addEventListener("change", async () => {
+        language = languageSelector.value;
+        await chrome.storage.sync.set({ language });
+        translateUI();
+    });
 
     webhookSwitch.addEventListener("change", async () => {
         webhookEnabled = webhookSwitch.checked;
@@ -145,15 +165,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert(translations[language].saveWebhook + "!");
     });
 
-
     async function addUrl(newUrl) {
-        // URL'nin başına 'https://' ekleme
         if (!/^https?:\/\//i.test(newUrl)) {
-            newUrl = 'https://' + newUrl;
+            newUrl = "https://" + newUrl;
         }
 
         if (!urls.includes(newUrl)) {
-            // Yeni URL'yi listenin başına eklemek için 'unshift' kullanıyoruz
             urls.unshift(newUrl);
             lastSuccessTimes[newUrl] = Date.now();
             statusMap[newUrl] = false;
@@ -171,8 +188,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    urlInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+    urlInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
             const newUrl = urlInput.value.trim();
             if (newUrl) addUrl(newUrl);
             urlInput.value = "";
@@ -186,4 +203,54 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     translateUI();
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const intervalInput = document.getElementById("intervalInput");
+    const progressBar = document.getElementById("progressBar");
+    const refreshButton = document.getElementById("refreshButton");
+
+    let currentInterval = parseInt(intervalInput.value, 10) || 60;
+    let progress = 0;
+    let timer;
+
+    function startTimer() {
+        clearInterval(timer);
+        progress = 0;
+        progressBar.style.width = "0%";
+
+        timer = setInterval(() => {
+            progress += 100 / currentInterval;
+            progressBar.style.width = `${progress}%`;
+
+            if (progress >= 100) {
+                progress = 0;
+                progressBar.style.width = "0%";
+                checkAllUrls();
+            }
+        }, 1000);
+    }
+
+    async function checkAllUrls() {
+        const { urls } = await chrome.storage.sync.get({ urls: [] });
+        urls.forEach((url) => {
+            chrome.runtime.sendMessage({ action: "checkUrl", url });
+        });
+    }
+
+    refreshButton.addEventListener("click", () => {
+        progress = 0;
+        progressBar.style.width = "0%";
+        checkAllUrls();
+    });
+
+    intervalInput.addEventListener("change", () => {
+        currentInterval = parseInt(intervalInput.value, 10) || 60;
+        if (currentInterval < 10) currentInterval = 10;
+        if (currentInterval > 300) currentInterval = 300;
+        intervalInput.value = currentInterval;
+        startTimer();
+    });
+
+    startTimer();
 });

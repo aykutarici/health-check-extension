@@ -227,3 +227,51 @@ body {
     background-size: contain;
 }
 
+.timer-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.timer-container input {
+    width: 60px;
+    padding: 5px;
+    font-size: 0.9em;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.timer-container .progress {
+    flex-grow: 1;
+    height: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.timer-container .progress #progressBar {
+    height: 100%;
+    width: 0%;
+    background-color: #189c5c;
+    transition: width 0.1s linear;
+}
+
+.timer-container button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background-color: #189c5c;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.timer-container button img {
+    width: 20px;
+    height: 20px;
+}
